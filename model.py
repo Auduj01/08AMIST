@@ -41,31 +41,6 @@ def train():
     r2 = r2_score(y_test, y_pred)
     print('mean square error:', mse)
 
-    return('model trained successfully')
+    print('model trained successfully')
 
-@app.route('/predict', methods=['GET'])   
-def predict():
-    #load the model from disk
-filename = 'model/rental_prediction_model.pkl'
-model = pickle.load(open(filename, 'rb'))
-
-#Read Inputs from inputs/inputs.json
-with open('inputs/inputs.json', 'r') as f:
- user_input = json.load(f)
-
-Room =  user_input['Room']
-sq_ft =  user_input['sq_ft']
-
-user_input_prediction = np.array([[Room,sq_ft]])
-predicted_rental_price = model.predict(user_input_prediction )
-#predict the rental price
-output = {'Rental Price Prediction Using Model':float(predicted_rental_price[0])}
-
-
-# write outputs to outputs/outputs.json
-with open('outputs/outputs.json', 'w') as f:
-    json.dump(output, f)
- 
-print(output) 
-if __name__ =='__main__':
-    app.run(port=5000, debug=True)
+    
