@@ -2,42 +2,44 @@ import pandas as pd
 import numpy as np
 import json
 import pickle
-import numpy as np
-from sklearn import linear_model
-from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
-from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 from flask import Flask
-
 
 app = Flask(__name__)
 
 @app.route('/train', methods=['GET'])
 def predict():
-   
-    #load the model from disk
+    
+    # This part is commented out until real training data is defined
+    model = LinearRegression()
+    model.fit(x_train, y_train)
+
+    # Save the model to disk (if already trained)
+    filename = 'model/rental_prediction_model.pkl'
+    pickle.dump(model, open(filename, 'wb'))
+
+    # Load the model from disk
     filename = 'model/rental_prediction_model.pkl'
     model = pickle.load(open(filename, 'rb'))
-   
 
-#Read Inputs from inputs/inputs.json
-with open('inputs/inputs.json', 'r') as f:
- user_input = json.load(f)
+    # Read inputs from inputs/inputs.json
+    with open('inputs/inputs.json', 'r') as f:
+        user_input = json.load(f)
 
-Room =  user_input['Room']
-sq_ft =  user_input['sq_ft']
+    Room = user_input['Room']
+    sq_ft = user_input['sq_ft']
 
-user_input_prediction = np.array([[Room,sq_ft]])
-predicted_rental_price = model.predict(user_input_prediction )
+    user_input_prediction = np.array([[Room, sq_ft]])
+    predicted_rental_price = model.predict(user_input_prediction)
 
-#predict the rental price
-output = {'Rental Price Prediction Using Model':float(predicted_rental_price[0])}
+    # Predict the rental price
+    output = {'Rental Price Prediction Using Model': float(predicted_rental_price[0])}
 
+    # Write outputs to outputs/outputs.json
+    with open('outputs/outputs.json', 'w') as f:
+        json.dump(output, f)
 
-# write outputs to outputs/outputs.json
-with open('outputs/outputs.json', 'w') as f:
-    json.dump(output, f)
+    return output
 
-print(output)
-
-return  output
+if __name__ == '__main__':
+    app.run(debug=True)
